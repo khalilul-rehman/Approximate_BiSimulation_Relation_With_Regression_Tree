@@ -14,9 +14,9 @@ addpath('SupportingFunctions/Optimization/');
     % Dimension_of_ClassVariables = 2;
 
     dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/RoomHeatingSystem/DataFiles/'); % '/Users/khalilulrehman/Academic/Phd Italy 2023_26/University of LAquila/Research Papers tasks/MatlabCodes/RegressionTree/CaseStudies/RoomHeatingBenchmark/';
-    traning_data_trajectories_file = 'RH_leaf_classification_trejectory_dataset.csv';
-    test_data_trajectories_file = 'RH_leaf_classification_trejectory_dataset_test.csv';
-    constraint_file_name = '/RH_constrants_array_on_leaves.csv';
+    traning_data_trajectories_file = 'leaf_classified_trejectory_dataset.csv';
+    test_data_trajectories_file = 'leaf_classified_test_trejectory_dataset.csv';
+    constraint_file_name = 'constrants_array_on_leaves.csv';
     Dimension_of_Attributes = 3;
     Dimension_of_ClassVariables = 3;
 
