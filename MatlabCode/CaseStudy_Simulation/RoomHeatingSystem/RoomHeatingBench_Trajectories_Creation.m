@@ -2,7 +2,7 @@ clc; clear; close all;
 
 %% Parameters
 dt = 0.1;  % Time step
-T = 12;    % Total simulation time
+T = 20;    % Total simulation time
 time_steps = T / dt;
 
 % Continuous System Matrices (from Equation 8 in the paper)
@@ -28,7 +28,7 @@ u = 4;
 
 numberOfSimulation = 10;
 trejectories = cell(numberOfSimulation, 0);
-list_of_initial_temprature = getRandomInitialTemprature(numberOfSimulation, 12, 18) %-10, 20
+list_of_initial_temprature = getRandomInitialTemprature(numberOfSimulation, 12, 18); %-10, 20
 
 for simulation_counter = 1 : numberOfSimulation
     % Initial conditions
@@ -155,4 +155,4 @@ for i = 1 : size(trejectories,1)
 end
 %% Saving data in file
 
- % csvwrite('RoomHeating_trejectory_dataset_test_12_18.csv',DataSet)
+ % csvwrite('DataFiles/RoomHeating_trejectory_dataset.csv',DataSet)
