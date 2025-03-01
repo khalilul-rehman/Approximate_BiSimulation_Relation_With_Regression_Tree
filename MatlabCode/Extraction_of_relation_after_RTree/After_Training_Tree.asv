@@ -4,13 +4,14 @@ addpath('SupportingFunctions/Polytopes/CustomPolyTope/');
 addpath('SupportingFunctions/Optimization/');
 %% 
 
+    parentDirectory = fileparts(cd);
 
-    dataFiles_folder_path = '/Users/khalilulrehman/Academic/Phd Italy 2023_26/University of LAquila/Research Papers tasks/MatlabCodes/RegressionTree/Extraction_of_relation_after_RTree/Data_Files/';
-    traning_data_trajectories_file = 'leaf_classified_trejectory_dataset.csv';
-    test_data_trajectories_file = 'leaf_classified_test_trejectory_dataset.csv';
-    constraint_file_name = '/constrants_array_on_leaves.csv';
-    Dimension_of_Attributes = 2;
-    Dimension_of_ClassVariables = 2;
+    % dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/NavigationSystem/Data_Files/');% '/Users/khalilulrehman/Academic/Phd Italy 2023_26/University of LAquila/Research Papers tasks/MatlabCodes/RegressionTree/Extraction_of_relation_after_RTree/Data_Files/';
+    % traning_data_trajectories_file = 'leaf_classified_trejectory_dataset.csv';
+    % test_data_trajectories_file = 'leaf_classified_test_trejectory_dataset.csv';
+    % constraint_file_name = '/constrants_array_on_leaves.csv';
+    % Dimension_of_Attributes = 2;
+    % Dimension_of_ClassVariables = 2;
 
    % dataFiles_folder_path = '/Users/khalilulrehman/Academic/Phd Italy 2023_26/University of LAquila/Research Papers tasks/MatlabCodes/RegressionTree/CaseStudies/RoomHeatingBenchmark/';
    % traning_data_trajectories_file = 'RH_leaf_classification_trejectory_dataset.csv';
@@ -232,9 +233,34 @@ end
      tempH(i,:) = [ i solutionOptimal_star{i,1}(1,1), size(LAMBDA{i,1},1) ];
  end
 
- rect
+ 
 
  %% Temp Code for graphical Represeztation
+numberOfHighH = size(find(tempH(:,2)<2), 1);
+rect_normal = cell(numberOfHighH, 0);
+rect_elv = cell(numberOfHighH, 0);
+counter_for_rects = 1;
+for i = 1 : size(solutionOptimal_star,1)
+    h = solutionOptimal_star{i,1}(1,1);
+    if h < 2
+        rect_normal{counter_for_rects,1} = vertices_of_polytopes{i,1};
+        rect_elv{counter_for_rects,1} = vertices_of_elevated_polytopes_before_span;
+        counter_for_rects = counter_for_rects + 1;
+    end
+end
+
+%% show elevated rectangles
+
+if size(vertices_of_elevated_polytopes_before_span{1,1},1) == 4
+    % Call the method on the instance
+    customPlot.drawDual2DPolytopesWithVertices(vertices_of_polytopes, vertices_of_elevated_polytopes_before_span, 'color1', '#8f9119', 'color2', '#197b91', 'title', 'Evevated 2D-Polytopes');
+    
+elseif size(vertices_of_elevated_polytopes_before_span{1,1},1) == 8
+    
+    customPlot.drawDual3DPolytopesWithVertices(vertices_of_polytopes, vertices_of_elevated_polytopes_before_span, 'color1', '#8f9119', 'color2', '#197b91', 'title', 'Evevated 3D-Polytopes');
+else
+    customPlot.drawDual2DPolytopesWithVertices(vertices_of_polytopes, vertices_of_elevated_polytopes_before_span, 'title', 'More the 3D Polytopes in 2D');
+end
 
 
 

@@ -2,7 +2,7 @@ clc; clear; close all;
 
 %% Parameters
 dt = 0.1;  % Time step
-T = 20;    % Total simulation time
+T = 20; %12   % Total simulation time
 time_steps = T / dt;
 
 % Continuous System Matrices (from Equation 8 in the paper)
