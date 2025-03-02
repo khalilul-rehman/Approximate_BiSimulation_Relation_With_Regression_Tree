@@ -6,19 +6,19 @@ addpath('SupportingFunctions/Optimization/');
 
     parentDirectory = fileparts(cd);
 
-    % dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/NavigationSystem/Data_Files/');% '/Users/khalilulrehman/Academic/Phd Italy 2023_26/University of LAquila/Research Papers tasks/MatlabCodes/RegressionTree/Extraction_of_relation_after_RTree/Data_Files/';
+     dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/NavigationSystem/Data_Files/');% '/Users/khalilulrehman/Academic/Phd Italy 2023_26/University of LAquila/Research Papers tasks/MatlabCodes/RegressionTree/Extraction_of_relation_after_RTree/Data_Files/';
+     traning_data_trajectories_file = 'leaf_classified_trejectory_dataset.csv';
+     test_data_trajectories_file = 'leaf_classified_test_trejectory_dataset.csv';
+     constraint_file_name = '/constrants_array_on_leaves.csv';
+     Dimension_of_Attributes = 2;
+     Dimension_of_ClassVariables = 2;
+
+    % dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/RoomHeatingSystem/DataFiles/'); % '/Users/khalilulrehman/Academic/Phd Italy 2023_26/University of LAquila/Research Papers tasks/MatlabCodes/RegressionTree/CaseStudies/RoomHeatingBenchmark/';
     % traning_data_trajectories_file = 'leaf_classified_trejectory_dataset.csv';
     % test_data_trajectories_file = 'leaf_classified_test_trejectory_dataset.csv';
-    % constraint_file_name = '/constrants_array_on_leaves.csv';
-    % Dimension_of_Attributes = 2;
-    % Dimension_of_ClassVariables = 2;
-
-    dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/RoomHeatingSystem/DataFiles/'); % '/Users/khalilulrehman/Academic/Phd Italy 2023_26/University of LAquila/Research Papers tasks/MatlabCodes/RegressionTree/CaseStudies/RoomHeatingBenchmark/';
-    traning_data_trajectories_file = 'leaf_classified_trejectory_dataset.csv';
-    test_data_trajectories_file = 'leaf_classified_test_trejectory_dataset.csv';
-    constraint_file_name = 'constrants_array_on_leaves.csv';
-    Dimension_of_Attributes = 3;
-    Dimension_of_ClassVariables = 3;
+    % constraint_file_name = 'constrants_array_on_leaves.csv';
+    % Dimension_of_Attributes = 3;
+    % Dimension_of_ClassVariables = 3;
 
 
 %% 
@@ -225,6 +225,40 @@ for i = 1 : size(state_graph_transition_matrix,1)
 end
 
 
+%% Checking Distance based on Optimization
+bounds_1 = customPolytope.getBoundsFromVertices(vertices_of_elevated_polytopes_before_span{1,1});
+bounds_2 = customPolytope.getBoundsFromVertices(vertices_of_polytopes{5,1});
+[x_opt, y_opt, min_distance] = customPolytope.minimize_polytope_distance(bounds_1,bounds_2);
+% Display results
+disp('Optimized x (from Polytope 1):');
+disp(x_opt);
+disp('Optimized y (from Polytope 2):');
+disp(y_opt);
+disp('Minimum Euclidean Distance:');
+disp(min_distance);
+%% 
+
+
+sgtm = zeros(numLeaves, numLeaves);
+for i = 1 : numLeaves
+    h = solutionOptimal_star{i}(1,1);
+    % bounds_1 = customPolytope.getBoundsFromVertices(vertices_of_elevated_polytopes_before_span{i,1});
+    for j = 1 : numLeaves
+        % if  h < 2
+
+            
+            % bounds_2 = customPolytope.getBoundsFromVertices(vertices_of_polytopes{j,1});
+            % [x_opt, y_opt, min_distance] = customPolytope.minimize_polytope_distance(bounds_1, bounds_2);
+            min_distance = customPolytope.findMinDistanceFromBounds(vertices_of_elevated_polytopes_before_span{i,1},vertices_of_polytopes{j,1})
+            if min_distance < h   
+                disp([min_distance, "-" , h, "<=>", min_distance < h ]);
+                sgtm(i,j) = 1;
+            end
+        % end
+    end
+end
+
+showGraph(sgtm);
 
 %% Checking max values
  tempH = zeros(size(solutionOptimal_star,1), 3);

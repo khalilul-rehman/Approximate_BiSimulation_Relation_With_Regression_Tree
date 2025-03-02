@@ -47,11 +47,124 @@ classdef CustomPolyTope
             end
         end
 
+        function bounds = getBoundsFromVertices(~, vertices)
+            % Check if the input is a non-empty matrix
+            if isempty(vertices) || ~ismatrix(vertices)
+                error('Input must be a non-empty 2D matrix.');
+            end
+
+            % Number of dimensions
+            numDimensions = size(vertices, 2);
+
+            % Initialize min and max bounds
+            minBounds = min(vertices);
+            maxBounds = max(vertices);
+
+            % Combine min and max bounds
+            bounds = zeros(1, 2 * numDimensions);
+            bounds(1:2:end) = minBounds;
+            bounds(2:2:end) = maxBounds;
+        end
+
+
+        function minDist = findMinDistanceFromBounds(~, vertices1, vertices2)
+            % FINDMINDISTANCEFROMBOUNDS computes the minimum distance between two polytopes
+            % using their bounding boxes.
+        
+            % Number of dimensions
+            n = size(vertices1, 2);
+        
+            % Compute bounding box min and max for each dimension
+            minBound1 = min(vertices1, [], 1);
+            maxBound1 = max(vertices1, [], 1);
+            minBound2 = min(vertices2, [], 1);
+            maxBound2 = max(vertices2, [], 1);
+        
+            % Define optimization variables (points inside the polytopes)
+            x = optimvar('x', n);
+            y = optimvar('y', n);
+        
+            % Objective function: minimize Euclidean distance
+            obj = sum((x - y).^2);
+            prob = optimproblem('Objective', obj);
+        
+            % Constraints: x and y should be inside their respective bounds
+            prob.Constraints.x_lower = minBound1' <= x;
+            prob.Constraints.x_upper = x <= maxBound1';
+            prob.Constraints.y_lower = minBound2' <= y;
+            prob.Constraints.y_upper = y <= maxBound2';
+        
+            % Initial guess (centroids of the bounding boxes)
+            x0.x = (minBound1 + maxBound1) / 2;
+            x0.y = (minBound2 + maxBound2) / 2;
+        
+            % Solve the optimization problem
+            sol = solve(prob, x0);
+        
+            % Compute final minimum distance
+            minDist = norm(sol.x - sol.y);
+        end
+
+
+
+    %{
+       function [x_opt, y_opt, min_distance] = minimize_polytope_distance(~,bounds_1, bounds_2)
+            % Ensure bounds_1 and bounds_2 have the same length
+            if length(bounds_1) ~= length(bounds_2)
+                error('bounds_1 and bounds_2 must have the same length.');
+            end
+            
+            % Number of dimensions
+            n = length(bounds_1) / 2;
+            
+            % Extract bounds for x and y
+            x_min = bounds_1(1:2:end);  % Odd indices: min values for x
+            x_max = bounds_1(2:2:end);  % Even indices: max values for x
+            y_min = bounds_2(1:2:end);  % Odd indices: min values for y
+            y_max = bounds_2(2:2:end);  % Even indices: max values for y
+            
+            % Initial guess (midpoint of bounds)
+            x0 = (x_min + x_max) / 2;
+            y0 = (y_min + y_max) / 2;
+            z0 = [x0; y0];
+            
+            % Lower and upper bounds for fmincon
+            lb = [x_min; y_min];  % Concatenate lower bounds for x and y
+            ub = [x_max; y_max];  % Concatenate upper bounds for x and y
+            
+            % Objective function: Squared Euclidean distance
+            objective = @(z) sum((z(1:n) - z(n+1:end)).^2);
+            
+            % No linear inequality or equality constraints
+            A = [];
+            b = [];
+            Aeq = [];
+            beq = [];
+            
+            % Perform the optimization using fmincon
+            options = optimoptions('fmincon', 'Display', 'off');
+            [z_opt, min_squared_distance] = fmincon(objective, z0, A, b, Aeq, beq, lb, ub, [], options);
+            
+            % Extract the optimized values
+            x_opt = z_opt(1:n);
+            y_opt = z_opt(n+1:end);
+            
+            % Calculate the actual Euclidean distance
+            min_distance = sqrt(min_squared_distance);
+
+            % Tolerance for considering the distance as zero
+            tolerance = 1e-6;
+            if min_distance < tolerance
+                min_distance = 0;
+            end
+        end
+
+    %}
 
 
 
 
-
+    %{
         function d = computeDistance(~, vertices1, vertices2)
             % Computes the minimum Euclidean distance between two convex polytopes.
             % If polytopes overlap, returns 0.
@@ -78,7 +191,7 @@ classdef CustomPolyTope
             end
         end
         
-       
+    %} 
    
         
     
@@ -87,7 +200,7 @@ classdef CustomPolyTope
 
     end
 
-
+%{
 methods (Static)
 
      function inside = isInsideConvexHull(points, polytopeVertices)
@@ -131,7 +244,7 @@ methods (Static)
 
 
 end
-    
+%}
 
 
 end
