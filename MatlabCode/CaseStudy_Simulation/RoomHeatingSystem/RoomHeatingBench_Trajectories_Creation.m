@@ -1,7 +1,7 @@
 clc; clear; close all;
 
 %% Parameters
-dt = 0.1;  % Time step
+dt = 0.01;  % Time step
 T = 20; %12   % Total simulation time
 time_steps = T / dt;
 
@@ -26,7 +26,7 @@ Hd = sys_d.B(:, 2:4); % Remaining columns correspond to discretized H
 % Outside temperature
 u = 4;
 
-numberOfSimulation = 10;
+numberOfSimulation = 1000;
 trejectories = cell(numberOfSimulation, 0);
 list_of_initial_temprature = getRandomInitialTemprature(numberOfSimulation, 12, 18); %-10, 20
 
@@ -155,4 +155,4 @@ for i = 1 : size(trejectories,1)
 end
 %% Saving data in file
 
- % csvwrite('DataFiles/RoomHeating_trejectory_dataset.csv',DataSet)
+  csvwrite('DataFiles/RoomHeating_trejectory_dataset.csv',DataSet)
