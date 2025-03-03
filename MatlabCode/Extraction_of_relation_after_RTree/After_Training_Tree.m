@@ -249,10 +249,12 @@ for i = 1 : numLeaves
             
             % bounds_2 = customPolytope.getBoundsFromVertices(vertices_of_polytopes{j,1});
             % [x_opt, y_opt, min_distance] = customPolytope.minimize_polytope_distance(bounds_1, bounds_2);
-            min_distance = customPolytope.findMinDistanceFromBounds(vertices_of_elevated_polytopes_before_span{i,1},vertices_of_polytopes{j,1})
+            min_distance = customPolytope.findMinDistanceFromBounds(vertices_of_elevated_polytopes_before_span{i,1},vertices_of_polytopes{j,1});
             if min_distance < h   
                 disp([min_distance, "-" , h, "<=>", min_distance < h ]);
                 sgtm(i,j) = 1;
+            else
+                disp("min distance is more then h");
             end
         % end
     end

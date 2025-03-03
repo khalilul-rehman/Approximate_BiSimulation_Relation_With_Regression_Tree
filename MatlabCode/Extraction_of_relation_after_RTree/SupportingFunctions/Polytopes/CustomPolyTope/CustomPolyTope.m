@@ -100,6 +100,11 @@ classdef CustomPolyTope
         
             % Solve the optimization problem
             sol = solve(prob, x0);
+
+            disp("Point 1 =>");
+            disp(sol.x);
+            disp("Point 2");
+            disp(sol.y);
         
             % Compute final minimum distance
             minDist = norm(sol.x - sol.y);
@@ -164,7 +169,7 @@ classdef CustomPolyTope
 
 
 
-    %{
+    
         function d = computeDistance(~, vertices1, vertices2)
             % Computes the minimum Euclidean distance between two convex polytopes.
             % If polytopes overlap, returns 0.
@@ -191,7 +196,7 @@ classdef CustomPolyTope
             end
         end
         
-    %} 
+    
    
         
     
@@ -200,7 +205,7 @@ classdef CustomPolyTope
 
     end
 
-%{
+
 methods (Static)
 
      function inside = isInsideConvexHull(points, polytopeVertices)
@@ -244,7 +249,7 @@ methods (Static)
 
 
 end
-%}
+
 
 
 end

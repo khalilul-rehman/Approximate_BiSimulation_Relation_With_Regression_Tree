@@ -47,107 +47,208 @@ classdef CustomPolyTope
             end
         end
 
+        function bounds = getBoundsFromVertices(~, vertices)
+            % Check if the input is a non-empty matrix
+            if isempty(vertices) || ~ismatrix(vertices)
+                error('Input must be a non-empty 2D matrix.');
+            end
+
+            % Number of dimensions
+            numDimensions = size(vertices, 2);
+
+            % Initialize min and max bounds
+            minBounds = min(vertices);
+            maxBounds = max(vertices);
+
+            % Combine min and max bounds
+            bounds = zeros(1, 2 * numDimensions);
+            bounds(1:2:end) = minBounds;
+            bounds(2:2:end) = maxBounds;
+        end
+
+
+        function minDist = findMinDistanceFromBounds(~, vertices1, vertices2)
+            % FINDMINDISTANCEFROMBOUNDS computes the minimum distance between two polytopes
+            % using their bounding boxes.
+        
+            % Number of dimensions
+            n = size(vertices1, 2);
+        
+            % Compute bounding box min and max for each dimension
+            minBound1 = min(vertices1, [], 1);
+            maxBound1 = max(vertices1, [], 1);
+            minBound2 = min(vertices2, [], 1);
+            maxBound2 = max(vertices2, [], 1);
+        
+            % Define optimization variables (points inside the polytopes)
+            x = optimvar('x', n);
+            y = optimvar('y', n);
+        
+            % Objective function: minimize Euclidean distance
+            obj = sum((x - y).^2);
+            prob = optimproblem('Objective', obj);
+        
+            % Constraints: x and y should be inside their respective bounds
+            prob.Constraints.x_lower = minBound1' <= x;
+            prob.Constraints.x_upper = x <= maxBound1';
+            prob.Constraints.y_lower = minBound2' <= y;
+            prob.Constraints.y_upper = y <= maxBound2';
+        
+            % Initial guess (centroids of the bounding boxes)
+            x0.x = (minBound1 + maxBound1) / 2;
+            x0.y = (minBound2 + maxBound2) / 2;
+        
+            % Solve the optimization problem
+            sol = solve(prob, x0);
+
+            disp(["Point 1 =>", "Point 2", sol.y]);
+            disp(sol.x);
+            
+        
+            % Compute final minimum distance
+            minDist = norm(sol.x - sol.y);
+        end
 
 
 
+    %{
+       function [x_opt, y_opt, min_distance] = minimize_polytope_distance(~,bounds_1, bounds_2)
+            % Ensure bounds_1 and bounds_2 have the same length
+            if length(bounds_1) ~= length(bounds_2)
+                error('bounds_1 and bounds_2 must have the same length.');
+            end
+            
+            % Number of dimensions
+            n = length(bounds_1) / 2;
+            
+            % Extract bounds for x and y
+            x_min = bounds_1(1:2:end);  % Odd indices: min values for x
+            x_max = bounds_1(2:2:end);  % Even indices: max values for x
+            y_min = bounds_2(1:2:end);  % Odd indices: min values for y
+            y_max = bounds_2(2:2:end);  % Even indices: max values for y
+            
+            % Initial guess (midpoint of bounds)
+            x0 = (x_min + x_max) / 2;
+            y0 = (y_min + y_max) / 2;
+            z0 = [x0; y0];
+            
+            % Lower and upper bounds for fmincon
+            lb = [x_min; y_min];  % Concatenate lower bounds for x and y
+            ub = [x_max; y_max];  % Concatenate upper bounds for x and y
+            
+            % Objective function: Squared Euclidean distance
+            objective = @(z) sum((z(1:n) - z(n+1:end)).^2);
+            
+            % No linear inequality or equality constraints
+            A = [];
+            b = [];
+            Aeq = [];
+            beq = [];
+            
+            % Perform the optimization using fmincon
+            options = optimoptions('fmincon', 'Display', 'off');
+            [z_opt, min_squared_distance] = fmincon(objective, z0, A, b, Aeq, beq, lb, ub, [], options);
+            
+            % Extract the optimized values
+            x_opt = z_opt(1:n);
+            y_opt = z_opt(n+1:end);
+            
+            % Calculate the actual Euclidean distance
+            min_distance = sqrt(min_squared_distance);
+
+            % Tolerance for considering the distance as zero
+            tolerance = 1e-6;
+            if min_distance < tolerance
+                min_distance = 0;
+            end
+        end
+
+    %}
+
+
+
+
+    %{
+        function d = computeDistance(~, vertices1, vertices2)
+            % Computes the minimum Euclidean distance between two convex polytopes.
+            % If polytopes overlap, returns 0.
+            
+            % Check if polytopes overlap
+            if any(CustomPolyTope.isInsideConvexHull(vertices1, vertices2)) || ...
+               any(CustomPolyTope.isInsideConvexHull(vertices2, vertices1))
+                d = 0;
+                return;
+            end
+            
+            % Compute minimum distance when polytopes do not overlap
+            numVertices1 = size(vertices1, 1);
+            numVertices2 = size(vertices2, 1);
+            d = inf;
+            
+            % Compute minimum vertex-to-polytope distance
+            for i = 1:numVertices1
+                d = min(d, CustomPolyTope.pointToPolytopeDistance(vertices1(i, :), vertices2));
+            end
+            
+            for j = 1:numVertices2
+                d = min(d, CustomPolyTope.pointToPolytopeDistance(vertices2(j, :), vertices1));
+            end
+        end
+        
+    %} 
    
         
-    function d = polytopeDistance(~,vertices1, vertices2)
-    % Computes the minimum Euclidean distance between two convex polytopes.
-    % If polytopes overlap, returns 0.
     
-    % Check if polytope 1 is inside polytope 2
-    if any(isInsideConvexHull(vertices1, vertices2))
-        d = 0;
-        return;
-    end
+
     
-    % Check if polytope 2 is inside polytope 1
-    if any(isInsideConvexHull(vertices2, vertices1))
-        d = 0;
-        return;
-    end
-    
-    % Compute the minimum distance when polytopes are separate
-    numVertices1 = size(vertices1, 1);
-    numVertices2 = size(vertices2, 1);
-    d = inf;
-    
-    % Compute minimum distance between vertices
-    for i = 1:numVertices1
-        d = min(d, pointToPolytopeDistance(vertices1(i, :), vertices2));
-    end
-    
-    for j = 1:numVertices2
-        d = min(d, pointToPolytopeDistance(vertices2(j, :), vertices1));
-    end
+
     end
 
+%{
+methods (Static)
 
-
-
-       function d = pointToPolytopeDistance(point, polytopeVertices)
-    % Compute the minimum Euclidean distance from a point to a polytope
-    % point: 1 × n vector (single point in n-dimensional space)
-    % polytopeVertices: Matrix (m × n) containing m vertices of the polytope
-    
-    numVertices = size(polytopeVertices, 1);
-    d = inf;
-    
-    % Iterate through all polytope vertices and compute Euclidean distance
-    for i = 1:numVertices
-        dist = norm(point - polytopeVertices(i, :));
-        d = min(d, dist);
-    end
-end
-
-     
-        function inside = isInsideConvexHull(~points, polytopeVertices)
-    % Determines if a set of points is inside the convex hull of a polytope
-    % points: (m × n) matrix, where each row is a point in n-dimensional space
-    % polytopeVertices: (p × n) matrix of polytope vertices
-    % Returns a logical array: 1 if the point is inside, 0 otherwise.
-    
-    numPoints = size(points, 1);
-    numVertices = size(polytopeVertices, 1);
-    numDims = size(polytopeVertices, 2);
-    
-    % Construct constraint matrices for convex hull formulation
-    A = [polytopeVertices'; ones(1, numVertices)];
-    lb = zeros(numVertices, 1);  % λ >= 0
-    ub = ones(numVertices, 1);   % λ <= 1
-    
-    inside = false(numPoints, 1);
-    
-    % Check each point
-    for i = 1:numPoints
-        b = [points(i, :)'; 1];  % The last row enforces convex combination
-        % Solve for λ using linear programming
-        f = zeros(numVertices, 1);
-        options = optimoptions('linprog', 'Display', 'off');
-        [~, ~, exitflag] = linprog(f, [], [], A, b, lb, ub, options);
-        
-        % If feasible solution exists, point is inside
-        if exitflag == 1
-            inside(i) = true;
+     function inside = isInsideConvexHull(points, polytopeVertices)
+            % Determines if a set of points is inside the convex hull of a polytope
+            % Uses linear programming (linprog)
+            
+            numPoints = size(points, 1);
+            numVertices = size(polytopeVertices, 1);
+            numDims = size(polytopeVertices, 2);
+            
+            % Construct constraint matrices for convex hull formulation
+            A = [polytopeVertices'; ones(1, numVertices)];
+            lb = zeros(numVertices, 1);
+            ub = ones(numVertices, 1);
+            
+            inside = false(numPoints, 1);
+            
+            % Check each point
+            for i = 1:numPoints
+                b = [points(i, :)'; 1];
+                f = zeros(numVertices, 1);
+                options = optimoptions('linprog', 'Display', 'off');
+                [~, ~, exitflag] = linprog(f, [], [], A, b, lb, ub, options);
+                
+                if exitflag == 1
+                    inside(i) = true;
+                end
+            end
         end
-    end
+        
+        function d = pointToPolytopeDistance(point, polytopeVertices)
+            % Computes the minimum distance from a point to a convex polytope
+            numVertices = size(polytopeVertices, 1);
+            d = inf;
+            
+            % Compute Euclidean distance to each vertex
+            for i = 1:numVertices
+                d = min(d, norm(point - polytopeVertices(i, :)));
+            end
+        end
+
+
 end
-
-
-    
-
-    end
-
-
-
-    methods (Static)
-
-     
-
-
-
-    end
+%}
 
 
 end
