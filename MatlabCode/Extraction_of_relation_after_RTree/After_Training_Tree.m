@@ -5,21 +5,22 @@ addpath('SupportingFunctions/Optimization/');
 %% 
 
     parentDirectory = fileparts(cd);
-%{
+
      dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/NavigationSystem/Data_Files/');% '/Users/khalilulrehman/Academic/Phd Italy 2023_26/University of LAquila/Research Papers tasks/MatlabCodes/RegressionTree/Extraction_of_relation_after_RTree/Data_Files/';
      traning_data_trajectories_file = 'leaf_classified_trejectory_dataset.csv';
      test_data_trajectories_file = 'leaf_classified_test_trejectory_dataset.csv';
      constraint_file_name = '/constrants_array_on_leaves.csv';
      Dimension_of_Attributes = 2;
      Dimension_of_ClassVariables = 2;
-%}
+
+     %{
      dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/RoomHeatingSystem/DataFiles/'); % '/Users/khalilulrehman/Academic/Phd Italy 2023_26/University of LAquila/Research Papers tasks/MatlabCodes/RegressionTree/CaseStudies/RoomHeatingBenchmark/';
      traning_data_trajectories_file = 'leaf_classified_trejectory_dataset.csv';
      test_data_trajectories_file = 'leaf_classified_test_trejectory_dataset.csv';
      constraint_file_name = 'constrants_array_on_leaves.csv';
      Dimension_of_Attributes = 3;
      Dimension_of_ClassVariables = 3;
-
+     %}
 
 %% 
 
@@ -207,10 +208,10 @@ for i = 1 : numLeaves
     h = solutionOptimal_star{i}(1,1);
     for j = 1 : numLeaves
         % if  h < 2
-            distance = customPolytope.computeDistance(vertices_of_elevated_polytopes_before_span{i,1}, vertices_of_polytopes{j,1});
+            [P1_opt, P2_opt, min_distance] = customPolytope.minimize_polytope_distance(vertices_of_polytopes{j,1}, vertices_of_elevated_polytopes_before_span{i,1});
     
-            if distance < h   
-                disp([distance, "" , h]);
+            if min_distance < h   
+                disp([min_distance, "" , h]);
                 state_graph_transition_matrix(i,j) = 1;
             end
         % end
