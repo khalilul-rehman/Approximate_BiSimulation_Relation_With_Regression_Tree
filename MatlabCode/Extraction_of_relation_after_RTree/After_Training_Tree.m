@@ -14,6 +14,7 @@ addpath('SupportingFunctions/Optimization/');
      Dimension_of_ClassVariables = 2;
 
      %{
+     
      dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/RoomHeatingSystem/DataFiles/'); % '/Users/khalilulrehman/Academic/Phd Italy 2023_26/University of LAquila/Research Papers tasks/MatlabCodes/RegressionTree/CaseStudies/RoomHeatingBenchmark/';
      traning_data_trajectories_file = 'leaf_classified_trejectory_dataset.csv';
      test_data_trajectories_file = 'leaf_classified_test_trejectory_dataset.csv';
@@ -208,8 +209,12 @@ for i = 1 : numLeaves
     h = solutionOptimal_star{i}(1,1);
     for j = 1 : numLeaves
         % if  h < 2
-            [P1_opt, P2_opt, min_distance] = customPolytope.minimize_polytope_distance(vertices_of_polytopes{j,1}, vertices_of_elevated_polytopes_before_span{i,1});
+
+            vertices_P1 = vertices_of_elevated_polytopes_before_span{i,1};
+            vertices_P2 = vertices_of_polytopes{j,1};
+            [P1_opt, P2_opt, min_distance] = customPolytope.minimize_polytope_distance_dual(vertices_P1, vertices_P2);
     
+
             if min_distance < h   
                 disp([min_distance, "" , h]);
                 state_graph_transition_matrix(i,j) = 1;
@@ -220,6 +225,8 @@ end
 %% 
 
  showGraph(state_graph_transition_matrix);
+ %% 
+
 for i = 1 : size(state_graph_transition_matrix,1)
     disp(["Transition from State  ", int2str(i), " to "]);
     disp(find(state_graph_transition_matrix(i,:)));

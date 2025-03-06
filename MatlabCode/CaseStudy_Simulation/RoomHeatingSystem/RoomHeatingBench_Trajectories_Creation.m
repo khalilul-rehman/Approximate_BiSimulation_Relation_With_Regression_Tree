@@ -1,7 +1,7 @@
 clc; clear; close all;
 
 %% Parameters
-dt = 0.01;  % Time step
+dt = 0.5;  % Time step
 T = 20; %12   % Total simulation time
 time_steps = T / dt;
 

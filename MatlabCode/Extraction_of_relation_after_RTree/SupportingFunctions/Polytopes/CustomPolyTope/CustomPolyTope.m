@@ -66,6 +66,62 @@ classdef CustomPolyTope
             bounds(2:2:end) = maxBounds;
         end
 
+
+        function [X_opt, Xp_opt, min_distance] = minimize_polytope_distance_dual(~, V1, V2)
+            % Inputs:
+            % V1: Vertices of Polytope 1 (n x d matrix)
+            % V2: Vertices of Polytope 2 (m x d matrix)
+            %
+            % Outputs:
+            % X_opt: Closest point in Polytope 1
+            % Xp_opt: Closest point in Polytope 2
+            % min_distance: Minimum Euclidean distance
+            
+            [n, d] = size(V1);  % Polytope 1 has n vertices in d dimensions
+            [m, ~] = size(V2);  % Polytope 2 has m vertices in d dimensions
+        
+            % Initial guess: Uniform distribution of weights
+            beta0 = ones(n, 1) / n;
+            alpha0 = ones(m, 1) / m;
+            z0 = [beta0; alpha0];
+        
+            % Objective function: Squared Euclidean distance
+            objective = @(z) norm((z(1:n)' * V1) - (z(n+1:end)' * V2))^2;
+        
+            % Lower and upper bounds for beta and alpha
+            lb = zeros(n + m, 1);
+            ub = ones(n + m, 1);
+        
+            % Linear equality constraints for convex combinations
+            Aeq = [ones(1, n), zeros(1, m);  % sum(beta) = 1
+                   zeros(1, n), ones(1, m)]; % sum(alpha) = 1
+            beq = [1; 1];
+        
+            % Optimization settings
+            options = optimoptions('fmincon', ...
+                'Display', 'off', ...
+                'OptimalityTolerance', 1e-8, ...
+                'StepTolerance', 1e-8, ...
+                'FunctionTolerance', 1e-8, ...
+                'MaxIterations', 1000, ...
+                'MaxFunctionEvaluations', 50000);
+        
+            % Solve optimization
+            [z_opt, ~] = fmincon(objective, z0, [], [], Aeq, beq, lb, ub, [], options);
+        
+            % Extract optimal values
+            beta_opt = z_opt(1:n);  % Weights for Polytope 1
+            alpha_opt = z_opt(n+1:end);  % Weights for Polytope 2
+            X_opt = beta_opt' * V1;  % Optimal point in Polytope 1
+            Xp_opt = alpha_opt' * V2;  % Optimal point in Polytope 2
+        
+            % Compute minimum Euclidean distance
+            min_distance = norm(X_opt - Xp_opt);
+        end
+
+
+
+        %{
         function [X_opt, Xp_opt, min_distance] = minimize_polytope_distance(~,V1, V2)
             % First polytope in the argument will be the uniform polytope,
             % uniform means axis aligned because its min and max values
@@ -106,9 +162,9 @@ classdef CustomPolyTope
             options = optimoptions('fmincon', ...
                 'Display', 'off', ...
                 'OptimalityTolerance', 1e-8, ...  % Tighter optimality tolerance
-                'StepTolerance', 1e-8, ...        % Tighter step tolerance
-                'FunctionTolerance', 1e-8, ...    % Tighter function tolerance
-                'MaxIterations', 1000, ...       %10000 % Increase maximum iterations
+                'StepTolerance', 1e-2, ...        % 1e-8 Tighter step tolerance
+                'FunctionTolerance', 1e-2, ...    % 1e-8 Tighter function tolerance
+                'MaxIterations', 10000, ...       %1000 % Increase maximum iterations
                 'MaxFunctionEvaluations', 50000);  % Increase maximum function evaluations
             
             [z_opt, ~] = fmincon(objective, z0, A, b, Aeq, beq, lb, ub, [], options);
@@ -121,7 +177,7 @@ classdef CustomPolyTope
             % Calculate the minimum Euclidean distance
             min_distance = norm(X_opt - Xp_opt);
         end
-
+        %}
 
         % function minDist = findMinDistanceFromBounds(~, vertices1, vertices2)
         %     % FINDMINDISTANCEFROMBOUNDS computes the minimum distance between two polytopes

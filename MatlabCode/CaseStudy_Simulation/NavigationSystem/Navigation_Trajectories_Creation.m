@@ -3,7 +3,7 @@ clc; clear; close all;
 %% Parameters
 n = 3;  % Grid size (rows)
 m = 3;  % Grid size (columns)
-dt = 0.01;  % Time step
+dt = 0.1;  % Time step
 T = 10;  % Simulation duration
 A = [-1.2 0.1; 
     0.1 -1.2];  % System matrix
@@ -23,7 +23,7 @@ grid_map = [-2 2 4;
             2 2 -1];
 
 
-numberOfSimulations = 1000;
+numberOfSimulations = 100;
 trajectories = cell(numberOfSimulations, 0);
 
 for counterForSimulation = 1 : numberOfSimulations
@@ -171,12 +171,12 @@ function [x_position, y_position] = getRandomInitialPosition(grid_map)
     y_position = navigationBlocks_to_strat(randomIndex,2);
     y_position = ( y_position+1 - y_position).*rand(1,1) + y_position;
 
-    % if (x_position > 2.9)
-    %     x_position = 2.9;
-    % end
-    % if y_position < 0.1
-    %     y_position = 0.1;
-    % end
+     if (x_position > 2.9)
+         x_position = 2.9;
+     end
+     if y_position < 0.1
+         y_position = 0.1;
+     end
     
 end
 
