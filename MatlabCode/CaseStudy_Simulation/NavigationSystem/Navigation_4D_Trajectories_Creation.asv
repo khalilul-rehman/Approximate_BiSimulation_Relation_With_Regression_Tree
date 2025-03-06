@@ -190,11 +190,7 @@ for i = 1 : size(trajectories,1)
 
     time_horizone = 1;
     nextStepState = circshift(one_Trejectory(:, 1:2), -time_horizone );
-    nextStepState = nextStepState(1:end-time_horizone, :);
-    one_Trejectory = one_Trejectory(1:end-time_horizone, :);
-
-
-    DataSet = [DataSet ; [one_Trejectory nextStepState]];
+    nextStepState = nextStepState(1:end-time_horizone, :)
     
     % d_lag = -1;
     % lags = [0 d_lag];
@@ -207,9 +203,9 @@ for i = 1 : size(trajectories,1)
     % size(Y_Trejectory)
     
     
-    % DataSet = [DataSet ; XLag_Trejectory]; %[DataSet ; XLag_Trejectory Y_Trejectory]
+    DataSet = [DataSet ; XLag_Trejectory]; %[DataSet ; XLag_Trejectory Y_Trejectory]
 end
 
 %% 
 
-   csvwrite('./Data_Files/4D_Data/navigation_trejectory_dataset.csv',DataSet);
+  % csvwrite('./Data_Files/navigation_trejectory_dataset.csv',DataSet)
