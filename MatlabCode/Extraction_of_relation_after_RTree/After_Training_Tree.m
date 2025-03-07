@@ -6,12 +6,12 @@ addpath('SupportingFunctions/Optimization/');
 
     parentDirectory = fileparts(cd);
 
-     dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/NavigationSystem/Data_Files/');% '/Users/khalilulrehman/Academic/Phd Italy 2023_26/University of LAquila/Research Papers tasks/MatlabCodes/RegressionTree/Extraction_of_relation_after_RTree/Data_Files/';
+     dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/NavigationSystem/Data_Files/4D_Data/');% '/Users/khalilulrehman/Academic/Phd Italy 2023_26/University of LAquila/Research Papers tasks/MatlabCodes/RegressionTree/Extraction_of_relation_after_RTree/Data_Files/';
      traning_data_trajectories_file = 'leaf_classified_trejectory_dataset.csv';
      test_data_trajectories_file = 'leaf_classified_test_trejectory_dataset.csv';
      constraint_file_name = '/constrants_array_on_leaves.csv';
-     Dimension_of_Attributes = 2;
-     Dimension_of_ClassVariables = 2;
+     Dimension_of_Attributes = 4;
+     Dimension_of_ClassVariables = 4;
 
      %{
      
@@ -199,6 +199,7 @@ elseif size(vertices_of_elevated_polytopes_before_span{1,1},1) == 8
     
     customPlot.drawDual3DPolytopesWithVertices(vertices_of_polytopes, vertices_of_elevated_polytopes_before_span, 'color1', '#8f9119', 'color2', '#197b91', 'title', 'Evevated 3D-Polytopes');
 else
+    customPlot.drawDual3DPolytopesWithVertices(vertices_of_polytopes, vertices_of_elevated_polytopes_before_span, 'color1', '#8f9119', 'color2', '#197b91', 'title', 'Evevated 3D-Polytopes');
     customPlot.drawDual2DPolytopesWithVertices(vertices_of_polytopes, vertices_of_elevated_polytopes_before_span, 'title', 'More the 3D Polytopes in 2D');
 end
 
@@ -216,7 +217,7 @@ for i = 1 : numLeaves
     
 
             if min_distance < h   
-                disp([min_distance, "" , h]);
+                %disp([min_distance, "" , h]);
                 state_graph_transition_matrix(i,j) = 1;
             end
         % end

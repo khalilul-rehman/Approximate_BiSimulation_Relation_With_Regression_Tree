@@ -288,7 +288,7 @@ classdef CustomPlotClass
             
             % Iterate over each set of vertices and draw the polytope
             for i = 1:length(vertices1)
-                polytopeVertices1 = vertices1{i};
+                polytopeVertices1 = vertices1{i}(:,1:3);
                 % Define faces of the polytope (assumes rectangular polytope)
                 faces1 = [1 2 4 3; 1 2 6 5; 1 3 7 5; 2 4 8 6; 3 4 8 7; 5 6 8 7];
                 
@@ -300,7 +300,7 @@ classdef CustomPlotClass
             end
 
             for i = 1:length(vertices2)
-                polytopeVertices2 = vertices2{i};
+                polytopeVertices2 = vertices2{i}(:,1:3);
                 % Define faces of the polytope (assumes rectangular polytope)
                 faces2 = [1 2 4 3; 1 2 6 5; 1 3 7 5; 2 4 8 6; 3 4 8 7; 5 6 8 7];
                 

@@ -189,7 +189,7 @@ for i = 1 : size(trajectories,1)
     size(one_Trejectory);
 
     time_horizone = 1;
-    nextStepState = circshift(one_Trejectory(:, 1:2), -time_horizone );
+    nextStepState = circshift(one_Trejectory, -time_horizone );
     nextStepState = nextStepState(1:end-time_horizone, :);
     one_Trejectory = one_Trejectory(1:end-time_horizone, :);
 
