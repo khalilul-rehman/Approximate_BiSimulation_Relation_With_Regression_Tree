@@ -120,6 +120,59 @@ classdef CustomPolyTope
         end
 
 
+        function [smallestPolytope, smallestEdgeLength, edgeVertices] = findSmallestPolytopeAndEdge(~, polytopes)
+            % Find the smallest n-dimensional polytope and its smallest edge.
+            %
+            % Inputs:
+            %   - polytopes: A cell array where each row contains an n-dimensional matrix
+            %                representing the vertices of a polytope.
+            %
+            % Outputs:
+            %   - smallestPolytope: The vertices of the smallest polytope.
+            %   - smallestEdgeLength: The length of the smallest edge in the smallest polytope.
+            %   - edgeVertices: The two vertices defining the smallest edge.
+        
+            numPolytopes = length(polytopes);
+            polytopeVolumes = zeros(numPolytopes, 1);
+        
+            % Calculate the volume of each polytope
+            for i = 1:numPolytopes
+                vertices = polytopes{i};
+                if size(vertices, 1) > size(vertices, 2)
+                    vertices = vertices'; % Ensure vertices are columns for convhulln
+                end
+                try
+                    K = convhulln(vertices'); % Compute convex hull
+                    polytopeVolumes(i) = volumeConvexHull(vertices, K); % Compute volume
+                catch
+                    polytopeVolumes(i) = inf; % Handle degenerate cases
+                end
+            end
+        
+            % Find the smallest polytope based on volume
+            [~, minIndex] = min(polytopeVolumes);
+            smallestPolytope = polytopes{minIndex};
+        
+            % Compute the smallest edge of the smallest polytope
+            numVertices = size(smallestPolytope, 1);
+            smallestEdgeLength = inf;
+            edgeVertices = [];
+        
+            for i = 1:numVertices
+                for j = i+1:numVertices
+                    edgeLength = norm(smallestPolytope(i, :) - smallestPolytope(j, :));
+                    if edgeLength < smallestEdgeLength
+                        smallestEdgeLength = edgeLength;
+                        edgeVertices = [smallestPolytope(i, :); smallestPolytope(j, :)];
+                    end
+                end
+            end
+        end
+        
+        
+
+
+
 
         %{
         function [X_opt, Xp_opt, min_distance] = minimize_polytope_distance(~,V1, V2)
@@ -317,6 +370,16 @@ classdef CustomPolyTope
 
     end
 
+    methods (Static)
+        function volume = volumeConvexHull(vertices, K)
+            % Compute the volume of a convex hull using the simplices defined by K
+            volume = 0;
+            for i = 1:size(K, 1)
+                simplex = vertices(K(i, :), :); % Get the vertices of the simplex
+                volume = volume + abs(det([simplex, ones(size(simplex, 1), 1)])) / factorial(size(simplex, 1) - 1);
+            end
+        end
+    end
 
 % methods (Static)
 % 

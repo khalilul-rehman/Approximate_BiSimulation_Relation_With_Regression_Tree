@@ -240,9 +240,9 @@ disp('Vertices of the Smallest Edge:');
 disp(edgeVertices);
 
 
-smallestPolytope = ones(1,size(minOfAllDimensions,2)/2) * smallestEdgeLength;
+smallestPolytope = ones(size(minOfAllDimensions,2)/2) * smallestEdgeLength;
 numberOfSmallestpolytopes = calculatePolytopesToFillSpace(minOfAllDimensions(1:2:end), maxOfAllDimensions(2:2:end), smallestPolytope );
-disp(["# of Polytopes to fill the state space = ", int2str(numberOfSmallestpolytopes)]);
+disp("# of Polytopes to fill the ");
  %% 
 
 
