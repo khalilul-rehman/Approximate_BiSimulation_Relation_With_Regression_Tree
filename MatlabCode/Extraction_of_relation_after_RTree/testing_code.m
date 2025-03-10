@@ -194,3 +194,16 @@ function plotVertives(polytopeVertices)
                     
                     plot(polytopeVertices(K, 1), polytopeVertices(K, 2), 'LineWidth', 2); %, 'Color', edgeColor
                 end
+
+                
+ %%
+ %vertices_of_polytopes, vertices_of_elevated_polytopes_before_span
+
+ new_vertices_of_polytopes = cell(size(vertices_of_polytopes,1),0);
+ new_vertices_of_elevated_polytopes_before_span = cell(size(vertices_of_elevated_polytopes_before_span,1),0);
+ for tempi = 1 : size(vertices_of_polytopes,1)
+     new_vertices_of_polytopes{tempi,1} = vertices_of_polytopes{tempi,1}(:,[1 2 4]);
+     new_vertices_of_elevated_polytopes_before_span{tempi,1} = vertices_of_elevated_polytopes_before_span{tempi,1}(:,[1 2 4]);
+ end
+
+ customPlot.drawDual3DPolytopesWithVertices(new_vertices_of_polytopes,new_vertices_of_elevated_polytopes_before_span);

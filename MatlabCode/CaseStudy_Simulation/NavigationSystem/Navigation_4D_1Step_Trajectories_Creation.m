@@ -23,7 +23,7 @@ grid_map = [-2 2 4;
             2 2 -1];
 
 
-numberOfSimulations = 1000;
+numberOfSimulations = 10000;
 trajectories = cell(numberOfSimulations, 0);
 
 for counterForSimulation = 1 : numberOfSimulations
@@ -54,7 +54,7 @@ for counterForSimulation = 1 : numberOfSimulations
     
     
     %% Simulation Loop
-    for t = 0:dt:T
+    for t = 0:0
         % Determine the grid cell (round to nearest integer index)
         x_position = ceil(x(1));
         y_position = ceil(x(2));
@@ -184,6 +184,8 @@ function [x_position, y_position] = getRandomInitialPosition(grid_map)
          y_position = 0.1;
      end
 %}
+    % As this is one trajectory to end the simulation
+    
     
 end
 
@@ -223,4 +225,4 @@ end
 
 %% 
 
-   csvwrite('./Data_Files/4D_Data/RandomInitCondition/navigation_trejectory_dataset.csv',DataSet);
+   csvwrite('./Data_Files/4D_Data/OneStepSimulation/navigation_trejectory_dataset.csv',DataSet);

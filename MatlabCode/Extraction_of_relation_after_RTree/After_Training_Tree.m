@@ -7,7 +7,7 @@ addpath('SupportingFunctions/Optimization/');
     parentDirectory = fileparts(cd);
 
      %dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/NavigationSystem/Data_Files/4D_Data/');% '/Users/khalilulrehman/Academic/Phd Italy 2023_26/University of LAquila/Research Papers tasks/MatlabCodes/RegressionTree/Extraction_of_relation_after_RTree/Data_Files/';
-     dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/NavigationSystem/Data_Files/4D_Data/RandomInitCondition/');
+     dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/NavigationSystem/Data_Files/4D_Data/OneStepSimulation/');
      
      traning_data_trajectories_file = 'leaf_classified_trejectory_dataset.csv';
      test_data_trajectories_file = 'leaf_classified_test_trejectory_dataset.csv';
