@@ -6,7 +6,9 @@ addpath('SupportingFunctions/Optimization/');
 
     parentDirectory = fileparts(cd);
 
-     dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/NavigationSystem/Data_Files/4D_Data/');% '/Users/khalilulrehman/Academic/Phd Italy 2023_26/University of LAquila/Research Papers tasks/MatlabCodes/RegressionTree/Extraction_of_relation_after_RTree/Data_Files/';
+     %dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/NavigationSystem/Data_Files/4D_Data/');% '/Users/khalilulrehman/Academic/Phd Italy 2023_26/University of LAquila/Research Papers tasks/MatlabCodes/RegressionTree/Extraction_of_relation_after_RTree/Data_Files/';
+     dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/NavigationSystem/Data_Files/4D_Data/RandomInitCondition/');
+     
      traning_data_trajectories_file = 'leaf_classified_trejectory_dataset.csv';
      test_data_trajectories_file = 'leaf_classified_test_trejectory_dataset.csv';
      constraint_file_name = '/constrants_array_on_leaves.csv';
@@ -69,7 +71,7 @@ elseif size(constraints_on_leaves,2) == 6
     % customPlot.draw3DPolytopesWithVertices(vertices_of_polytopes, 'title', 'Constraints as 3D-Cubes', 'color', '#8f9119');
     customPlot.draw3DPolytopesWithVertices(vertices_of_polytopes);
 else
-    customPlot.drawConstraintsIn2D(constraints_on_leaves, 'title', 'More the 3D Constraints in 2D');
+    customPlot.drawConstraintsIn2D(constraints_on_leaves, 'title', 'More then 3D Constraints in 2D');
 end
 
 %% 
@@ -104,7 +106,7 @@ solutionOptimal_star = cell(numLeaves,1);
 
 % y_hat_with_optimization = (m * trejectories_on_leaves{i}(:,1:4)')' + mo'
 NRMSE_Training = customOptimization.NRMSE_Calculation(LAMBDA,lambda,solutionOptimal_star);
-disp(["NRMSE on Traning data = ", NRMSE_Training*100]);
+disp(["NRMSE on Training data = ", NRMSE_Training*100]);
 
 
 %% Loading Testing Data
@@ -200,7 +202,7 @@ elseif size(vertices_of_elevated_polytopes_before_span{1,1},1) == 8
     customPlot.drawDual3DPolytopesWithVertices(vertices_of_polytopes, vertices_of_elevated_polytopes_before_span, 'color1', '#8f9119', 'color2', '#197b91', 'title', 'Evevated 3D-Polytopes');
 else
     customPlot.drawDual3DPolytopesWithVertices(vertices_of_polytopes, vertices_of_elevated_polytopes_before_span, 'color1', '#8f9119', 'color2', '#197b91', 'title', 'Evevated 3D-Polytopes');
-    customPlot.drawDual2DPolytopesWithVertices(vertices_of_polytopes, vertices_of_elevated_polytopes_before_span, 'title', 'More the 3D Polytopes in 2D');
+    customPlot.drawDual2DPolytopesWithVertices(vertices_of_polytopes, vertices_of_elevated_polytopes_before_span, 'title', 'More then 3D Polytopes in 2D');
 end
 
 
@@ -229,6 +231,7 @@ end
  %% Getting stats on # of states found and noramally calculated
  [smallestPolytope, smallestEdgeLength, edgeVertices] = customPolytope.findSmallestPolytopeAndEdge(vertices_of_polytopes);
 
+ 
  % Display the results
 disp('Smallest Polytope:');
 disp(smallestPolytope);
@@ -238,11 +241,13 @@ disp(smallestEdgeLength);
 
 disp('Vertices of the Smallest Edge:');
 disp(edgeVertices);
+ 
 
 
 smallestPolytope = ones(1,size(minOfAllDimensions,2)/2) * smallestEdgeLength;
 numberOfSmallestpolytopes = calculatePolytopesToFillSpace(minOfAllDimensions(1:2:end), maxOfAllDimensions(2:2:end), smallestPolytope );
-disp(["# of Polytopes to fill the state space = ", int2str(numberOfSmallestpolytopes)]);
+disp(['# of Polytopes to fill the state space = ', int2str(numberOfSmallestpolytopes)]);
+disp(['# of Polytopes predicted with our model = ', int2str(numLeaves)]);
  %% 
 
 
@@ -252,42 +257,10 @@ for i = 1 : size(state_graph_transition_matrix,1)
 end
 
 
-%% Checking Distance based on Optimization
-bounds_1 = customPolytope.getBoundsFromVertices(vertices_of_elevated_polytopes_before_span{1,1});
-bounds_2 = customPolytope.getBoundsFromVertices(vertices_of_polytopes{5,1});
-[x_opt, y_opt, min_distance] = customPolytope.minimize_polytope_distance(bounds_1,bounds_2);
-% Display results
-disp('Optimized x (from Polytope 1):');
-disp(x_opt);
-disp('Optimized y (from Polytope 2):');
-disp(y_opt);
-disp('Minimum Euclidean Distance:');
-disp(min_distance);
+
 %% 
 
 
-sgtm = zeros(numLeaves, numLeaves);
-for i = 1 : numLeaves
-    h = solutionOptimal_star{i}(1,1);
-    % bounds_1 = customPolytope.getBoundsFromVertices(vertices_of_elevated_polytopes_before_span{i,1});
-    for j = 1 : numLeaves
-        % if  h < 2
-
-            
-            % bounds_2 = customPolytope.getBoundsFromVertices(vertices_of_polytopes{j,1});
-            % [x_opt, y_opt, min_distance] = customPolytope.minimize_polytope_distance(bounds_1, bounds_2);
-            min_distance = customPolytope.findMinDistanceFromBounds(vertices_of_elevated_polytopes_before_span{i,1},vertices_of_polytopes{j,1});
-            if min_distance < h   
-                disp([min_distance, "-" , h, "<=>", min_distance < h ]);
-                sgtm(i,j) = 1;
-            else
-                disp("min distance is more then h");
-            end
-        % end
-    end
-end
-
-showGraph(sgtm);
 
 %% Checking max values
  tempH = zeros(size(solutionOptimal_star,1), 3);
