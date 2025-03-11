@@ -320,15 +320,6 @@ toleranceForHCompare = 0.000001;
 disp('Support Sub Sample Calculation Finised');
 
 %% 
-numberOfSupportSubSamples = zeros(size(support_subSample_LAMBDA,1), 3);
-for i = 1 : size(numberOfSupportSubSamples,1)
-    numberOfSupportSubSamples(i,1) = size(LAMBDA{i},1);
-    numberOfSupportSubSamples(i,2) = size(support_subSample_LAMBDA{i},1);
-    numberOfSupportSubSamples(i,3) = size(LAMBDA{i},1) - size(support_subSample_LAMBDA{i},1);
-end
-
-filename_SSS = strcat(dataFiles_folder_path, 'numberOfSupportSubSamples.xlsx');
-writematrix(numberOfSupportSubSamples,filename_SSS,'Sheet',1,'Range','A1');
 %% 
 
 
