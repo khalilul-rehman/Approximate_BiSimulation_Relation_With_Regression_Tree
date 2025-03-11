@@ -71,7 +71,7 @@ classdef CustomOptimization
             ceq = []; % No equality constraints
         end
 
-
+    %{
         function [NRMSE] = NRMSE_Calculation(obj, LAMBDA, lambda, QCP_Solution_For_Prediction)
             % NRMSE_Calculation computes the Normalized Root Mean Square Error (NRMSE)
             % for multivariate outputs when QCP_Solution_For_Prediction is a cell array.
@@ -115,6 +115,7 @@ classdef CustomOptimization
                 for j = 1:num_samples
                     y_pred = (m * LAMBDA{i}(j, :)')' + mo'; % Predicted y (p × 1)
                     leaf_errors{i}(j, :) = lambda{i}(j, :) - y_pred; % Store error (1 × p)
+
                 end
                 
                 if size(lambda{i}, 1) >= 1
@@ -132,6 +133,70 @@ classdef CustomOptimization
                 NRMSE = NaN;  % Return NaN if no valid leaves exist
             end
         end
+
+    %}
+        function [NRMSE] = NRMSE_Calculation(obj, LAMBDA, lambda, QCP_Solution_For_Prediction)
+            % NRMSE_Calculation computes the Normalized Root Mean Square Error (NRMSE)
+            % for multivariate outputs when QCP_Solution_For_Prediction is a cell array.
+            %
+            % Inputs:
+            %   - LAMBDA: Cell array where each cell contains (N_i x d) feature matrix
+            %   - lambda: Cell array where each cell contains (N_i x p) true output matrix
+            %   - QCP_Solution_For_Prediction: Cell array where each cell contains 
+            %     a vector [h, m (p x d), mo (p x 1)] for the corresponding leaf
+            %
+            % Output:
+            %   - NRMSE: Normalized RMSE value averaged over all leaf nodes
+
+            % Get the output dimensions from the first non-empty lambda
+            firstNonEmpty = find(~cellfun('isempty', lambda), 1);
+            if isempty(firstNonEmpty)
+                error('All input cells are empty.');
+            end
+            p = size(lambda{firstNonEmpty}, 2);
+            
+            % Initialize errors with correct dimensions
+            errors_with_QP = zeros(size(LAMBDA, 1), 1); % Initialize errors
+            leaf_errors = cell(size(LAMBDA, 1), 1);     % Store errors for each leaf
+
+            for i = 1:size(LAMBDA, 1)
+                if isempty(lambda{i}) || isempty(LAMBDA{i}) || isempty(QCP_Solution_For_Prediction{i})
+                    continue;  % Skip empty leaves
+                end
+                
+                [num_samples, p] = size(lambda{i}); % Number of samples and output dimensions
+                d = size(LAMBDA{i}, 2); % Number of features
+                
+                leaf_errors{i} = zeros(num_samples,1); % Initialize error matrix
+                
+                % Extract m (p x d) and mo (p x 1) from cell QCP_Solution_For_Prediction{i}
+                solution_vector = QCP_Solution_For_Prediction{i}(1:p, 2:end); % Extract solution vector
+                m = solution_vector(1:p, 1:d); % Reshape to (p × d)
+                mo = solution_vector(1:p, d+1:end); % Extract mo (p × 1)
+                
+                % Compute prediction error for each sample in the leaf
+                for j = 1:num_samples
+                    y_pred = (m * LAMBDA{i}(j, :)')' + mo'; % Predicted y (p × 1)
+                     differences = lambda{i}(j, :) - y_pred; % Element-wise differences % Store error (1 × p)
+                     leaf_errors{i}(j) = sum(differences.^2, 2); %squaredNorms
+                end
+                
+                if size(lambda{i}, 1) >= 1
+                    % Compute RMSE for each output dimension
+                    RMSE = sqrt(mean(leaf_errors{i})); 
+                    errors_with_QP(i) = RMSE ./ mean(mean(lambda{i})); % Average over output dimensions
+                end
+            end
+
+            % Compute final NRMSE by averaging over non-empty leaves
+            num_non_empty_Leafs = sum(~cellfun(@isempty, lambda));
+            if num_non_empty_Leafs > 0
+                NRMSE = sum(errors_with_QP) / num_non_empty_Leafs;
+            else
+                NRMSE = NaN;  % Return NaN if no valid leaves exist
+            end
+        end
+
 
 
 
