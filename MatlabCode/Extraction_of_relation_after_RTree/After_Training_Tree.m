@@ -2,12 +2,16 @@ addpath('SupportingFunctions/');
 addpath('SupportingFunctions/Polytopes/Plot');
 addpath('SupportingFunctions/Polytopes/CustomPolyTope/');
 addpath('SupportingFunctions/Optimization/');
+
+%% 
+%parpool;
+
 %% 
 
     parentDirectory = fileparts(cd);
 
      %dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/NavigationSystem/Data_Files/4D_Data/');% '/Users/khalilulrehman/Academic/Phd Italy 2023_26/University of LAquila/Research Papers tasks/MatlabCodes/RegressionTree/Extraction_of_relation_after_RTree/Data_Files/';
-     dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/NavigationSystem/Data_Files/4D_Data/OneStepSimulation/');
+     dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/NavigationSystem/Data_Files/4D_Data/OneStepSimulation/1LacSimulation/');
      
      traning_data_trajectories_file = 'leaf_classified_trejectory_dataset.csv';
      test_data_trajectories_file = 'leaf_classified_test_trejectory_dataset.csv';
@@ -207,6 +211,8 @@ end
 
 
 %% Checking the Distance between polytopes to check for transition
+
+%{ 
 state_graph_transition_matrix = zeros(numLeaves, numLeaves);
 for i = 1 : numLeaves
     h = solutionOptimal_star{i}(1,1);
@@ -225,9 +231,64 @@ for i = 1 : numLeaves
         % end
     end
 end
-%% 
+%}
+% Parallel Processing version is below
+% Preallocate the state transition matrix
+state_graph_transition_matrix = zeros(numLeaves + 1, numLeaves + 1); % this extra 1 is for to save the state goes out of the state space or not
 
- showGraph(state_graph_transition_matrix);
+% Open a parallel pool if it's not already running
+if isempty(gcp('nocreate'))
+    parpool; % Starts a parallel pool with available workers
+end
+
+% Parallelize the outer loop
+parfor i = 1:numLeaves
+    h = solutionOptimal_star{i}(1,1);
+
+    % Initialize local variables (for parfor compatibility)
+    local_row = zeros(1, numLeaves); % Store results for row i
+
+    % Iterate over columns of the matrix
+    for j = 1:numLeaves
+        vertices_P1 = vertices_of_elevated_polytopes_before_span{i,1};
+        vertices_P2 = vertices_of_polytopes{j,1};
+        [~, ~, min_distance] = customPolytope.minimize_polytope_distance_dual(vertices_P1, vertices_P2);
+
+        if min_distance < h
+            local_row(j) = 1; % Assign transition state
+        end
+    end
+
+    trajectory_go_out = 0;
+    x_out_space = ~isempty(find(all(trajectories_on_leaves{i,1}(:,5) < 0 | trajectories_on_leaves{i,1}(:,5) > 3, 2)));
+    y_out_space = ~isempty(find(all(trajectories_on_leaves{i,1}(:,6) < 0 | trajectories_on_leaves{i,1}(:,6) > 3, 2)));
+
+    if x_out_space || y_out_space
+        trajectory_go_out = 1;
+    end
+
+    % Store the result in the global matrix
+    state_graph_transition_matrix(i, :) = [local_row trajectory_go_out];
+end
+
+% Display or process the resulting state graph
+disp('State transition matrix computation completed.');
+
+%% For one time
+%{
+for i = 1 : numLeaves
+    x_out_space = ~isempty(find(all(trajectories_on_leaves{i,1}(:,5) < 0 | trajectories_on_leaves{i,1}(:,5) > 3, 2)));
+    y_out_space = ~isempty(find(all(trajectories_on_leaves{i,1}(:,6) < 0 | trajectories_on_leaves{i,1}(:,6) > 3, 2)));
+    if x_out_space || y_out_space
+        state_graph_transition_matrix(i, numLeaves+1) = 1;
+    end
+end
+%}
+
+%% 
+orange_states = find(all(state_graph_transition_matrix(:,numLeaves+1) > 0, 2));
+red_states = [numLeaves+1];
+showGraphWithHighLightedStates(state_graph_transition_matrix,orange_states, red_states);
  %% Getting stats on # of states found and noramally calculated
  [smallestPolytope, smallestEdgeLength, edgeVertices] = customPolytope.findSmallestPolytopeAndEdge(vertices_of_polytopes);
 

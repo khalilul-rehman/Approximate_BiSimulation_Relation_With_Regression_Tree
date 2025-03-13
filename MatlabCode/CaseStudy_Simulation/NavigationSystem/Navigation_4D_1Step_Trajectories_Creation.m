@@ -1,5 +1,9 @@
 clc; clear; close all;
 
+
+%parpool;
+
+
 %% Parameters
 n = 3;  % Grid size (rows)
 m = 3;  % Grid size (columns)
@@ -23,11 +27,11 @@ grid_map = [-2 2 4;
             2 2 -1];
 
 
-numberOfSimulations = 10000;
+numberOfSimulations = 100000;
 trajectories = cell(numberOfSimulations, 0);
 
 for counterForSimulation = 1 : numberOfSimulations
-    
+%parfor counterForSimulation = 1 : numberOfSimulations
     %% Initial Conditions
     % Initial Position
     x = [0.5; 1.5];
@@ -142,7 +146,8 @@ for i = 1 : size(grid_map,1)
         end
     end
 end
-for i = 1 : size(trajectories, 1)
+%for i = 1 : size(trajectories, 1)
+parfor i = 1 : size(trajectories, 1)
     plot(trajectories{i}(1, :), trajectories{i}(2, :), 'b-', 'LineWidth', 1);
     scatter(trajectories{i}(1, :), trajectories{i}(2, :));
 end
@@ -225,4 +230,4 @@ end
 
 %% 
 
-   csvwrite('./Data_Files/4D_Data/OneStepSimulation/navigation_trejectory_dataset.csv',DataSet);
+   csvwrite('./Data_Files/4D_Data/OneStepSimulation/1LacSimulation/navigation_trejectory_dataset.csv',DataSet);
