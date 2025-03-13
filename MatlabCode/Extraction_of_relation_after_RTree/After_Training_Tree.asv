@@ -275,12 +275,15 @@ end
 disp('State transition matrix computation completed.');
 
 %% For one time
+%{
 for i = 1 : numLeaves
     x_out_space = ~isempty(find(all(trajectories_on_leaves{i,1}(:,5) < 0 | trajectories_on_leaves{i,1}(:,5) > 3, 2)));
     y_out_space = ~isempty(find(all(trajectories_on_leaves{i,1}(:,6) < 0 | trajectories_on_leaves{i,1}(:,6) > 3, 2)));
-
+    if x_out_space || y_out_space
+        state_graph_transition_matrix(i, numLeaves+1) = 1;
+    end
 end
-
+%}
 
 %% 
 orange_states = find(all(state_graph_transition_matrix(:,numLeaves+1) > 0, 2));
@@ -306,6 +309,17 @@ smallestPolytope = ones(1,size(minOfAllDimensions,2)/2) * smallestEdgeLength;
 numberOfSmallestpolytopes = calculatePolytopesToFillSpace(minOfAllDimensions(1:2:end), maxOfAllDimensions(2:2:end), smallestPolytope );
 disp(['# of Polytopes to fill the state space = ', int2str(numberOfSmallestpolytopes)]);
 disp(['# of Polytopes predicted with our model = ', int2str(numLeaves)]);
+
+
+%% 
+numberOfDataInEachPolytope = zeros(1,numLeaves);
+for i = 1 :numLeaves
+    numberOfDataInEachPolytope(1,i) = size(LAMBDA{i,1},1);
+end
+Beta = 0.05;
+[epsilon, epsilon_j1, epsilon_j2] = compute_epsilon_ScenarioBasedApproach(numberOfDataInEachPolytope,Beta);
+disp('Final epsilon value:');
+disp(epsilon);
  %% 
 
 

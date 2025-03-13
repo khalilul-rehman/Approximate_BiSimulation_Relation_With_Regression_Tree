@@ -309,6 +309,18 @@ smallestPolytope = ones(1,size(minOfAllDimensions,2)/2) * smallestEdgeLength;
 numberOfSmallestpolytopes = calculatePolytopesToFillSpace(minOfAllDimensions(1:2:end), maxOfAllDimensions(2:2:end), smallestPolytope );
 disp(['# of Polytopes to fill the state space = ', int2str(numberOfSmallestpolytopes)]);
 disp(['# of Polytopes predicted with our model = ', int2str(numLeaves)]);
+
+
+%% 
+numberOfDataInEachPolytope = zeros(1,numLeaves);
+for i = 1 :numLeaves
+    numberOfDataInEachPolytope(1,i) = size(LAMBDA{i,1},1);
+end
+Beta = 1e-5;
+
+epsilon = calculate_epsilon(numberOfDataInEachPolytope,4,Beta);
+disp('Min epsilon value:');
+disp(min(epsilon));
  %% 
 
 
