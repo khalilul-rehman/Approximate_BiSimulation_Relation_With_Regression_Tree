@@ -27,7 +27,7 @@ grid_map = [-2 2 4;
             2 2 -1];
 
 
-numberOfSimulations = 1000;
+numberOfSimulations = 30000;
 trajectories = zeros(numberOfSimulations, 8); %cell(numberOfSimulations, 0);
 
 
@@ -138,7 +138,7 @@ end
 disp("End of data creation");
 %% 
 
-%{
+
 % --- Plotting the Results ---
 figure;
 hold on;
@@ -173,7 +173,7 @@ for i = 1 : size(trajectories, 1)
 end
 hold off;   
 
-%}
+
 %% 
 
 
@@ -261,4 +261,4 @@ end
 %}
 %% 
 
-   csvwrite('./Data_Files/4D_Data/OneStepSimulation/500000Sim/navigation_trejectory_dataset.csv',trajectories);
+%  csvwrite('/home/devunivaq/ResearchTasks/Approximate_BiSimulation_Relation_With_Regression_Tree/MatlabCode/CaseStudy_Simulation/NavigationSystem/Data_Files/4D_Data/OneStepSimulation/2nd_3rd_Step/25k_Sim/navigation_trejectory_dataset.csv',trajectories);

@@ -120,6 +120,73 @@ classdef CustomPolyTope
         end
 
 
+
+
+        function [smallestPolytope, smallestEdgeLength, edgeVertices] = findSmallestPolytopeAndEdge(~, polytopes)
+    % Find the smallest n-dimensional polytope and its smallest edge.
+    %
+    % Inputs:
+    %   - polytopes: A cell array where each row contains an n-dimensional matrix
+    %                representing the vertices of a polytope.
+    %
+    % Outputs:
+    %   - smallestPolytope: The vertices of the smallest polytope.
+    %   - smallestEdgeLength: The length of the smallest edge in the smallest polytope.
+    %   - edgeVertices: The two vertices defining the smallest edge.
+
+    numPolytopes = length(polytopes);
+    polytopeVolumes = zeros(numPolytopes, 1);
+
+    % Calculate the volume of each polytope
+    for i = 1:numPolytopes
+        vertices = polytopes{i};
+        if size(vertices, 1) > size(vertices, 2)
+            vertices = vertices'; % Ensure vertices are columns for convhulln
+        end
+        try
+            K = convhulln(vertices'); % Compute convex hull
+            polytopeVolumes(i) = volumeConvexHull(vertices, K); % Compute volume
+        catch
+            polytopeVolumes(i) = inf; % Handle degenerate cases
+        end
+    end
+
+    % Find the smallest polytope based on volume
+    [~, minIndex] = min(polytopeVolumes);
+    smallestPolytope = polytopes{minIndex};
+
+    % Compute the smallest edge of the smallest polytope
+    numVertices = size(smallestPolytope, 1);
+    smallestEdgeLength = inf;
+    edgeVertices = [];
+
+    % Initialize a flag to handle zero-length edges
+    hasZeroEdge = false;
+
+    for i = 1:numVertices
+        for j = i+1:numVertices
+            edgeLength = norm(smallestPolytope(i, :) - smallestPolytope(j, :));
+            % Check if this edge is smaller and not zero-length
+            if edgeLength < smallestEdgeLength && edgeLength > 0
+                smallestEdgeLength = edgeLength;
+                edgeVertices = [smallestPolytope(i, :); smallestPolytope(j, :)];
+            elseif edgeLength == 0
+                hasZeroEdge = true; % Mark that we encountered a zero-length edge
+            end
+        end
+    end
+
+    % If only zero-length edges were found, report an error or notify
+    if hasZeroEdge && smallestEdgeLength == inf
+        warning('Only zero-length edges were found in the smallest polytope.');
+        smallestEdgeLength = 0;
+        edgeVertices = [];
+    end
+end
+
+
+
+        %{
         function [smallestPolytope, smallestEdgeLength, edgeVertices] = findSmallestPolytopeAndEdge(~, polytopes)
             % Find the smallest n-dimensional polytope and its smallest edge.
             %
@@ -169,7 +236,7 @@ classdef CustomPolyTope
             end
         end
         
-        
+        %}
 
 
 

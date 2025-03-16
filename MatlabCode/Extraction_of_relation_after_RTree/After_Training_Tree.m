@@ -12,7 +12,7 @@ addpath("SupportingFunctions/ScenarioBasedApproach/");
 
      %dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/NavigationSystem/Data_Files/4D_Data/');% '/Users/khalilulrehman/Academic/Phd Italy 2023_26/University of LAquila/Research Papers tasks/MatlabCodes/RegressionTree/Extraction_of_relation_after_RTree/Data_Files/';
      %dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/NavigationSystem/Data_Files/4D_Data/OneStepSimulation/10Th_MSLeaf250/');
-     dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/NavigationSystem/Data_Files/4D_Data/OneStepSimulation/500000Sim/ML3000/');
+     dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/NavigationSystem/Data_Files/4D_Data/OneStepSimulation/30k_R0_3/');
      
      traning_data_trajectories_file = 'leaf_classified_trejectory_dataset.csv';
      test_data_trajectories_file = 'leaf_classified_test_trejectory_dataset.csv';
@@ -79,6 +79,7 @@ elseif size(constraints_on_leaves,2) == 6
     customPlot.draw3DPolytopesWithVertices(vertices_of_polytopes);
 else
     customPlot.drawConstraintsIn2D(constraints_on_leaves, 'title', 'More then 3D Constraints in 2D');
+    customPlot.draw3DPolytopesWithVertices(vertices_of_polytopes);
 end
 
 %% 
@@ -240,6 +241,8 @@ elseif size(vertices_of_elevated_polytopes_before_span{1,1},1) == 8
 else
     customPlot.drawDual3DPolytopesWithVertices(vertices_of_polytopes, vertices_of_elevated_polytopes_before_span, 'color1', '#8f9119', 'color2', '#197b91', 'title', 'Evevated 3D-Polytopes');
     customPlot.drawDual2DPolytopesWithVertices(vertices_of_polytopes, vertices_of_elevated_polytopes_before_span, 'title', 'More then 3D Polytopes in 2D');
+
+    
 end
 
 
@@ -339,6 +342,7 @@ disp(edgeVertices);
 
 
 smallestPolytope = ones(1,size(minOfAllDimensions,2)/2) * smallestEdgeLength;
+ 
 numberOfSmallestpolytopes = calculatePolytopesToFillSpace(minOfAllDimensions(1:2:end), maxOfAllDimensions(2:2:end), smallestPolytope );
 disp(['# of Polytopes to fill the state space = ', int2str(numberOfSmallestpolytopes)]);
 disp(['# of Polytopes predicted with our model = ', int2str(numLeaves)]);

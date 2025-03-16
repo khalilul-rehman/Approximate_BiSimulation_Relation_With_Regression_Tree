@@ -1,0 +1,33 @@
+digraph Tree {
+node [shape=box, style="filled, rounded", color="black", fontname="helvetica"] ;
+edge [fontname="helvetica"] ;
+0 [label=<X2 &le; 1.484<br/>squared_error = 0.335<br/>samples = 30000<br/>value = [[1.526]<br/>[1.488]<br/>[0.138]<br/>[-0.106]]>, fillcolor="#ffffff"] ;
+1 [label=<X1 &le; 1.154<br/>squared_error = 0.163<br/>samples = 14824<br/>value = [[1.183]<br/>[0.731]<br/>[0.172]<br/>[-0.071]]>, fillcolor="#f0b88f"] ;
+0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
+2 [label=<X2 &le; 0.701<br/>squared_error = 0.07<br/>samples = 7328<br/>value = [[0.608]<br/>[0.66]<br/>[0.178]<br/>[-0.056]]>, fillcolor="#e89152"] ;
+1 -> 2 ;
+3 [label=<squared_error = 0.037<br/>samples = 3991<br/>value = [[0.599]<br/>[0.355]<br/>[0.213]<br/>[-0.016]]>, fillcolor="#e6843d"] ;
+2 -> 3 ;
+4 [label=<squared_error = 0.045<br/>samples = 3337<br/>value = [[0.62]<br/>[1.025]<br/>[0.135]<br/>[-0.103]]>, fillcolor="#e68742"] ;
+2 -> 4 ;
+5 [label=<X2 &le; 0.874<br/>squared_error = 0.093<br/>samples = 7496<br/>value = [[1.744]<br/>[0.801]<br/>[0.167]<br/>[-0.085]]>, fillcolor="#ea9b61"] ;
+1 -> 5 ;
+6 [label=<squared_error = 0.031<br/>samples = 3745<br/>value = [[1.609]<br/>[0.426]<br/>[0.212]<br/>[-0.016]]>, fillcolor="#e58139"] ;
+5 -> 6 ;
+7 [label=<squared_error = 0.072<br/>samples = 3751<br/>value = [[1.879]<br/>[1.176]<br/>[0.123]<br/>[-0.155]]>, fillcolor="#e89254"] ;
+5 -> 7 ;
+8 [label=<X1 &le; 1.866<br/>squared_error = 0.168<br/>samples = 15176<br/>value = [[1.861]<br/>[2.227]<br/>[0.104]<br/>[-0.14]]>, fillcolor="#f1ba92"] ;
+0 -> 8 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+9 [label=<X2 &le; 2.048<br/>squared_error = 0.1<br/>samples = 7652<br/>value = [[1.302]<br/>[2.151]<br/>[0.167]<br/>[-0.089]]>, fillcolor="#eb9d66"] ;
+8 -> 9 ;
+10 [label=<squared_error = 0.077<br/>samples = 3589<br/>value = [[1.133]<br/>[1.741]<br/>[0.115]<br/>[-0.171]]>, fillcolor="#e99457"] ;
+9 -> 10 ;
+11 [label=<squared_error = 0.034<br/>samples = 4063<br/>value = [[1.453]<br/>[2.513]<br/>[0.213]<br/>[-0.016]]>, fillcolor="#e5823b"] ;
+9 -> 11 ;
+12 [label=<X2 &le; 2.29<br/>squared_error = 0.071<br/>samples = 7524<br/>value = [[2.43]<br/>[2.305]<br/>[0.04]<br/>[-0.193]]>, fillcolor="#e89153"] ;
+8 -> 12 ;
+13 [label=<squared_error = 0.043<br/>samples = 3414<br/>value = [[2.415]<br/>[1.925]<br/>[0.043]<br/>[-0.196]]>, fillcolor="#e68640"] ;
+12 -> 13 ;
+14 [label=<squared_error = 0.039<br/>samples = 4110<br/>value = [[2.443]<br/>[2.621]<br/>[0.039]<br/>[-0.19]]>, fillcolor="#e6843e"] ;
+12 -> 14 ;
+}
