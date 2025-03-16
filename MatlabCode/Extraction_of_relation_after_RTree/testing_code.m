@@ -207,3 +207,49 @@ function plotVertives(polytopeVertices)
  end
 
  customPlot.drawDual3DPolytopesWithVertices(new_vertices_of_polytopes,new_vertices_of_elevated_polytopes_before_span);
+
+
+
+ %% 
+%function nrmse = compareVelocities(trajectories)
+    % Input:
+    %   - trajectories: Matrix with columns as follows:
+    %       Columns 1-2: First position (x1, y1)
+    %       Columns 3-4: Velocity at first position (vx1, vy1)
+    %       Columns 5-6: Second position (x2, y2)
+    %       Columns 7-8: Velocity at second position (vx2, vy2)
+    %   - Time difference between positions: 0.1 seconds
+
+    % Time difference
+    dt = 0.1; % Time difference between positions (in seconds)
+
+    % Extract positions and velocities
+    pos1 = trajectories(:, 1:2); % First position (x1, y1)
+    vel1 = trajectories(:, 3:4); % Velocity at first position (vx1, vy1)
+    pos2 = trajectories(:, 5:6); % Second position (x2, y2)
+    vel2 = trajectories(:, 7:8); % Velocity at second position (vx2, vy2)
+
+    % Calculate velocity using finite differences
+    calculated_velocity = (pos2 - pos1) / dt; % Finite difference velocity
+
+    % Calculate average velocity from the given velocities
+    average_velocity = (vel1 + vel2) / 2; % Average of vel1 and vel2
+
+    % Calculate NRMSE (Normalized Root Mean Square Error)
+    error = calculated_velocity - average_velocity; % Error between calculated and average velocity
+    mse = mean(error.^2, 'all'); % Mean Squared Error (MSE)
+    rmse = sqrt(mse); % Root Mean Squared Error (RMSE)
+    range = max(average_velocity, [], 'all') - min(average_velocity, [], 'all'); % Range of average velocity
+    nrmse = rmse / range; % Normalized RMSE
+
+    % Display results
+    %{
+    fprintf('Calculated Velocity:\n');
+    disp(calculated_velocity);
+    fprintf('Average Velocity:\n');
+    disp(average_velocity);
+    %}
+    fprintf('NRMSE between calculated and average velocity: %.4f\n', nrmse);
+%end
+
+%compareVelocities(trajectories)

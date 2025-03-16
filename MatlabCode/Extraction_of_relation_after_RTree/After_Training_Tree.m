@@ -2,7 +2,7 @@ addpath('SupportingFunctions/');
 addpath('SupportingFunctions/Polytopes/Plot');
 addpath('SupportingFunctions/Polytopes/CustomPolyTope/');
 addpath('SupportingFunctions/Optimization/');
-
+addpath("SupportingFunctions/ScenarioBasedApproach/");
 %% 
 %parpool;
 
@@ -11,7 +11,8 @@ addpath('SupportingFunctions/Optimization/');
     parentDirectory = fileparts(cd);
 
      %dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/NavigationSystem/Data_Files/4D_Data/');% '/Users/khalilulrehman/Academic/Phd Italy 2023_26/University of LAquila/Research Papers tasks/MatlabCodes/RegressionTree/Extraction_of_relation_after_RTree/Data_Files/';
-     dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/NavigationSystem/Data_Files/4D_Data/OneStepSimulation/1LacSimulation/');
+     %dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/NavigationSystem/Data_Files/4D_Data/OneStepSimulation/10Th_MSLeaf250/');
+     dataFiles_folder_path = strcat(parentDirectory, '/CaseStudy_Simulation/NavigationSystem/Data_Files/4D_Data/OneStepSimulation/500000Sim/ML3000/');
      
      traning_data_trajectories_file = 'leaf_classified_trejectory_dataset.csv';
      test_data_trajectories_file = 'leaf_classified_test_trejectory_dataset.csv';
@@ -63,6 +64,8 @@ customPolytope = CustomPolyTope();
 vertices_of_polytopes = customPolytope.getVerticesFromBounds(constraints_on_leaves);
 %% Create an instance of the class
 customPlot = CustomPlotClass();
+%% 
+
 
 if size(constraints_on_leaves,2) == 4
     % Call the method on the instance
@@ -96,21 +99,51 @@ end
 
 %% Optimization For each leaf
 customOptimization = CustomOptimization();
+%% 
+
 % h* m* mo*
 solutionOptimal_star = cell(numLeaves,1);
 % [ ones(numLeaves, 1) zeros(numLeaves, size(trejectories_on_leaves{1}, 2)) ones(numLeaves, 1)];
- for i = 1 : numLeaves
+% Open a parallel pool if it's not already running
+if isempty(gcp('nocreate'))
+    parpool; % Starts a parallel pool with available workers
+end
+parfor i = 1 : numLeaves
      disp(['Optimizing h* for leaf = ' , int2str(i)]);
      [h, m , mo] = customOptimization.QuadraticConstraintOptimizer(LAMBDA{i}, lambda{i});
      % [h, m , mo] = QuadraticConstraintOptimizer_MultivariateY( LAMBDA{i}, lambda{i});
       solutionOptimal_star{i,1} = [ones(size(m,1),1)*h m mo];
  end
 
+
+ %% Temp_ Remove it if do not worked well
+ %{
+ addpath('SupportingFunctions/temp_/')
+ solutionOptimal_star = cell(numLeaves,1);
+% [ ones(numLeaves, 1) zeros(numLeaves, size(trejectories_on_leaves{1}, 2)) ones(numLeaves, 1)];
+% Open a parallel pool if it's not already running
+
+if isempty(gcp('nocreate'))
+    %parpool; % Starts a parallel pool with available workers
+    parpool('local', 6); % Start a parallel pool with 4 workers
+end
+
+
+parfor i = 1 : numLeaves
+%i = 25;
+     disp(['Optimizing h* for leaf = ' , int2str(i)]);
+     [h, m , mo] = QuadraticConstraintOptimizer(LAMBDA{i}, lambda{i})
+     % [h, m , mo] = QuadraticConstraintOptimizer_MultivariateY( LAMBDA{i}, lambda{i});
+      solutionOptimal_star{i,1} = [ones(size(m,1),1)*h m mo];
+ end
+ %}
+
+
  %% Testing h m mo on traning data
 
 % y_hat_with_optimization = (m * trejectories_on_leaves{i}(:,1:4)')' + mo'
 NRMSE_Training = customOptimization.NRMSE_Calculation(LAMBDA,lambda,solutionOptimal_star);
-disp(["NRMSE on Training data = ", NRMSE_Training*100]);
+disp(["NRMSE on Training data = ", mean(NRMSE_Training)*100]);
 
 
 %% Loading Testing Data
@@ -142,7 +175,7 @@ end
 %% Checking NRMSE on Test data
 
 NRMSE_Testing = customOptimization.NRMSE_Calculation(LAMBDA_test,lambda_test,solutionOptimal_star);
-disp(["NRMSE on Testing data = ", NRMSE_Testing*100]);
+disp(["NRMSE on Testing data = ", mean(NRMSE_Testing)*100]);
 
 
 
@@ -174,7 +207,7 @@ p_shape_of_y = Dimension_of_ClassVariables;
 
 % vertices_of_elevated_polytopes = cell(numLeaves,0);
 vertices_of_elevated_polytopes_before_span = cell(numLeaves,0);
-for i = 1 : numLeaves
+parfor i = 1 : numLeaves
     h = solutionOptimal_star{i}(1,1);
     m =  solutionOptimal_star{i}( 1 : p_shape_of_y , 2 : 2 - 1 + q_shape_of_x);
     mo = solutionOptimal_star{i}( 1 : p_shape_of_y , end);
@@ -312,15 +345,42 @@ disp(['# of Polytopes predicted with our model = ', int2str(numLeaves)]);
 
 
 %% 
+%addpath('SupportingFunctions/ScenarioBasedApproach/calculateEpsilon/');
 numberOfDataInEachPolytope = zeros(1,numLeaves);
 for i = 1 :numLeaves
     numberOfDataInEachPolytope(1,i) = size(LAMBDA{i,1},1);
 end
+
+%{
 Beta = 1e-5;
 
-epsilon = calculate_epsilon(numberOfDataInEachPolytope,4,Beta);
-disp('Min epsilon value:');
-disp(min(epsilon));
+epsilon = calculateEpsilon(Beta,4,numberOfDataInEachPolytope);
+disp('Max epsilon value:');
+disp(epsilon);
+%tempiN = find(epsilon == min(epsilon));
+
+betas = calculateBeta(min(epsilon), 4, numberOfDataInEachPolytope);
+disp("Beta")
+disp(betas)
+%}
+%% 
+%addpath("Extraction_of_relation_after_RTree/SupportingFunctions/ScenarioBasedApproach/");
+% Example usage
+d = 3;
+N_array = [10, 20, 30];
+epsilon = 0.1;
+
+% Calculate beta for given epsilon
+betas = calculateBeta(epsilon, d, N_array);
+disp('Betas:');
+disp(betas);
+
+% Calculate epsilon for a given beta
+beta_target = 0.5;
+epsilons = calculateEpsilon(beta_target, d, N_array);
+disp('Epsilons:');
+disp(epsilons);
+
  %% 
 
 
@@ -344,8 +404,8 @@ end
 
  sortedTempH = sortrows(tempH,2);
 
- [maxhValue, index] = max(tempH);
- disp(["maxhValue = " , int2str(maxhValue), " index = " , int2str(index)]);
+% [maxhValue, index] = max(tempH);
+% disp(["maxhValue = " , int2str(maxhValue), " index = " , int2str(index)]);
 %% 
 %% Working with Scenario Based Approach
 

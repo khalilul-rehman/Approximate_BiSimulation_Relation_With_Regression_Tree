@@ -71,7 +71,7 @@ classdef CustomOptimization
             ceq = []; % No equality constraints
         end
 
-    %{
+    
         function [NRMSE] = NRMSE_Calculation(obj, LAMBDA, lambda, QCP_Solution_For_Prediction)
             % NRMSE_Calculation computes the Normalized Root Mean Square Error (NRMSE)
             % for multivariate outputs when QCP_Solution_For_Prediction is a cell array.
@@ -121,7 +121,7 @@ classdef CustomOptimization
                 if size(lambda{i}, 1) >= 1
                     % Compute RMSE for each output dimension
                     RMSE = sqrt(mean(leaf_errors{i}.^2) ./ size(lambda{i}, 1)); % RMSE (1 × p)
-                    errors_with_QP(i, :) = RMSE ./ mean(lambda{i}); % Average over output dimensions
+                    errors_with_QP(i, :) = RMSE ./ abs(mean(lambda{i})); % Average over output dimensions
                 end
             end
 
@@ -134,7 +134,9 @@ classdef CustomOptimization
             end
         end
 
-    %}
+    
+
+        %{
         function [NRMSE] = NRMSE_Calculation(obj, LAMBDA, lambda, QCP_Solution_For_Prediction)
             % NRMSE_Calculation computes the Normalized Root Mean Square Error (NRMSE)
             % for multivariate outputs when QCP_Solution_For_Prediction is a cell array.
@@ -184,7 +186,9 @@ classdef CustomOptimization
                 if size(lambda{i}, 1) >= 1
                     % Compute RMSE for each output dimension
                     RMSE = sqrt(mean(leaf_errors{i})); 
-                    errors_with_QP(i) = RMSE ./ mean(mean(lambda{i})); % Average over output dimensions
+                    %diff = max(lambda{i}) - min(lambda{i})
+                    errors_with_QP(i) = RMSE ./ mean(mean(lambda{i})); %(max(diff)-min(diff)) % Average over output dimensions
+
                 end
             end
 
@@ -196,9 +200,11 @@ classdef CustomOptimization
                 NRMSE = NaN;  % Return NaN if no valid leaves exist
             end
         end
-
+%}
 
 
 
     end
 end
+
+

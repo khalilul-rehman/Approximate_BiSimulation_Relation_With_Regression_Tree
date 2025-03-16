@@ -23,7 +23,7 @@ grid_map = [-2 2 4;
             2 2 -1];
 
 
-numberOfSimulations = 1000;
+numberOfSimulations = 100000;
 trajectories = cell(numberOfSimulations, 0);
 
 for counterForSimulation = 1 : numberOfSimulations
@@ -35,7 +35,7 @@ for counterForSimulation = 1 : numberOfSimulations
     [x(1), x(2)] = getRandomInitialPosition(grid_map);
     % disp(x);
 
-    v = [getRandomVelocity(-1,1); getRandomVelocity(-1,1)];
+    v = [getRandomVelocity(-0.5,0.5); getRandomVelocity(-0.5,0.5)]; % -1,1
     
     %{
     v = [0; 0];  % Initial velocity
@@ -175,15 +175,20 @@ function [x_position, y_position] = getRandomInitialPosition(grid_map)
     y_position = navigationBlocks_to_strat(randomIndex,2);
     y_position = ( y_position+1 - y_position).*rand(1,1) + y_position;
 
-%{
-    safeSpan = 0.1;
-     if (x_position > 2.9)
-         x_position = 2.9;
+
+     if (x_position > 2.8)
+         x_position = 2.8;
      end
-     if y_position < 0.1
-         y_position = 0.1;
+     if (x_position < 0.2)
+         x_position = 0.2;
      end
-%}
+     if y_position < 0.2
+         y_position = 0.2;
+     end
+     if y_position > 2.8
+         y_position = 2.8;
+     end
+
     % As this is one trajectory to end the simulation
     
     
@@ -224,5 +229,5 @@ for i = 1 : size(trajectories,1)
 end
 
 %% 
-
+disp("do you want to store the trajectories");
 %   csvwrite('./Data_Files/4D_Data/RandomInitCondition/navigation_trejectory_dataset.csv',DataSet);

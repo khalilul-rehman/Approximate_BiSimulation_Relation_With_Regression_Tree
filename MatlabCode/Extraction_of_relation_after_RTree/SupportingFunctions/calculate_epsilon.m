@@ -4,7 +4,7 @@ function epsilon = calculate_epsilon(lj, n, beta)
     options = optimoptions('lsqnonlin', 'Display', 'off');
     
     for j = 1:length(lj)
-        L = abs(lj(j));
+        L = lj(j);
         
         % Define the equation using arrayfun for size consistency
         equation = @(eps) sum(arrayfun(@(i) ...
